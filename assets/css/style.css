@@ -1,10 +1,82 @@
-*{
-    box-sizing: border-box;
+* {
+  box-sizing: border-box;
 }
-html{
-    font-size: 62.5%;
+:root {
+  --header-bg: #10375c;
 }
-body{
+html {
+  font-size: 62.5%;
+}
+body {
+  font-size: 1.6rem;
+  font-family: "Sora", sans-serif;
+}
+/* =================common============== */
+.container {
+  width: 1170px;
+  max-width: calc(100% - 48px);
+  margin: 0px auto;
+}
+a {
+  text-decoration: none;
+}
+.btn {
+  display: inline-block;
+  min-width: 205px;
+  line-height: 60px;
+  border-radius: 30px;
+  background: #2e80ce;
+  color: #fff;
+  text-align: center;
+  font-size: 1.8rem;
+  font-weight: 400;
+}
+.btn:hover{
+    opacity: 0.9;
+}
+/* =================header============== */
+.header {
+  padding-top: 30px;
+  background: var(--header-bg);
+  min-height: 100vh;
+}
+.header-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.navbar__list {
+  display: flex;
+}
+.header__action--login,
+.navbar__link {
+  padding: 8px 21px;
+  color: #c9d2da;
+  font-size: 1.6rem;
+  font-weight: 300;
+  line-height: 175%;
+}
+.navbar__link:hover,
+.navbar__link--active {
+  color: #fff;
+  text-shadow: 1px 0 0 currentColor;
+}
+.navbar__link--active::before {
+  content: " ";
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #fff;
+  position: relative;
+  right: 8px;
+  top: -3px;
+}
+.header__action--login{
+    margin-right: 7px;
+}
+.header__action--sign-up{
+    min-width: 144px;
+    line-height: 44px;
     font-size: 1.6rem;
-    font-family: "Sora", sans-serif;
 }
