@@ -31,8 +31,8 @@ a {
   font-size: 1.8rem;
   font-weight: 400;
 }
-.btn:hover{
-    opacity: 0.9;
+.btn:hover {
+  opacity: 0.9;
 }
 /* =================header============== */
 .header {
@@ -72,11 +72,62 @@ a {
   right: 8px;
   top: -3px;
 }
-.header__action--login{
-    margin-right: 7px;
+.header__action--login {
+  margin-right: 7px;
 }
-.header__action--sign-up{
-    min-width: 144px;
-    line-height: 44px;
-    font-size: 1.6rem;
+.header__action--sign-up {
+  min-width: 144px;
+  line-height: 44px;
+  font-size: 1.6rem;
+}
+/* =================hero============== */
+.hero {
+  display: flex;
+  align-items: center;
+  padding-top: 76px;
+}
+.hero__content {
+  width: 44%;
+}
+.hero__media {
+  flex: 1;
+}
+.hero__heading {
+  color: #fff;
+  font-size: 7rem;
+  font-weight: 600;
+  line-height: 114%;
+  letter-spacing: -1.4px;
+}
+.hero__desc {
+  margin-top: 22px;
+  color: #c9d2da;
+  font-size: 1.8rem;
+  font-weight: 300;
+  line-height: 166.7%;
+}
+.hero__row {
+  margin-top: 38px;
+  display: flex;
+  align-items: center;
+  gap: 38px;
+}
+.hero__phone {
+  color: #fff;
+  text-align: center;
+  font-size: 1.8rem;
+  line-height: 166.7%;
+}
+.hero__img {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+.hero__img--large{
+  margin-right: -6px;
+  z-index: 1;
+}
+.hero__img--small {
+  width: 210px;
+  height: 410px;
 }
