@@ -60,17 +60,17 @@ a {
   display: flex;
   justify-content: center;
   align-items: center;
-  border: 1px solid #575F66;
-  background: #FFF;
+  border: 1px solid #575f66;
+  background: #fff;
   cursor: pointer;
 }
-.control__btn:hover{
-  background: #2E80CE;
-  border: #2E80CE;
-  color: #FFF;
+.control__btn:hover {
+  background: #2e80ce;
+  border: #2e80ce;
+  color: #fff;
   transition: 0.25s;
 }
-.control-icon__next{
+.control-icon__next {
   rotate: 180deg;
 }
 /* =================header============== */
@@ -364,4 +364,45 @@ a {
 .team__control {
   margin-top: 38px;
   justify-content: center;
+}
+/* =================mobie============== */
+.mobie {
+  padding: 180px 0 85px;
+}
+.mobie__inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-radius: 4px;
+  background: #2e80ce;
+  height: 427px;
+  padding: 0 70px;
+  gap: 160px;
+  position: relative;
+}
+.mobie__img {
+  height: 522px;
+  object-fit: cover;
+  position: absolute;
+  bottom: 0;
+}
+.mobie__content{
+  max-width: 586px;
+}
+.mobie__heading {
+  color: #fff;
+  width: 489px;
+}
+.mobie__desc {
+  margin-top: 18px;
+  color: #fff;
+  font-size: 1.8rem;
+  font-weight: 300;
+  line-height: 166.7%;
+}
+.mobie__row{
+  margin-top: 38px;
+  display: flex;
+  align-items: center;
+  gap: 28px;
 }
