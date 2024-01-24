@@ -12,6 +12,13 @@ body {
   font-family: "Sora", sans-serif;
 }
 /* =================common============== */
+input,
+textarea,
+select,
+button {
+  font-size: inherit;
+  font-family: inherit;
+}
 .container {
   width: 1170px;
   max-width: calc(100% - 48px);
@@ -510,4 +517,104 @@ a {
   font-weight: 300;
   line-height: 175%;
   margin: 18px auto 38px;
+}
+/* =================cta============== */
+.footer {
+  margin-top: 85px;
+  background: #10375c;
+  padding-top: 100px;
+  font-family: "Open Sans", sans-serif;
+}
+.footer__top {
+  display: grid;
+  grid-template-columns: 1fr 0.4fr 0.4fr 1fr;
+  gap: 78px;
+}
+.footer__desc {
+  margin-top: 21px;
+  color: #a9b3bb;
+  line-height: 175%;
+}
+.footer__heading {
+  color: #fff;
+  font-weight: 600;
+  line-height: 175%;
+}
+.footer__list {
+  margin: 20px 0 28px;
+}
+.footer__item {
+  margin-bottom: 10px;
+}
+.footer__link {
+  color: #a9b3bb;
+  font-size: 1.4rem;
+  line-height: 185.7%;
+  white-space: nowrap;
+}
+.footer__link:hover {
+  text-decoration: underline;
+}
+.footer__social {
+  margin: 20px 0 28px;
+  display: flex;
+  gap: 10px;
+}
+.footer__social--btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  color: #2e80ce;
+  background: #fff;
+  transition: 0.5s;
+}
+.footer__social--btn:hover {
+  background: #2e80ce;
+  color: #fff;
+}
+.footer-form {
+  margin-top: 10px;
+  display: flex;
+  gap: 12px;
+}
+.footer-form__input {
+  width: 212px;
+  height: 46px;
+  border-radius: 4px;
+  border: 1px solid #406181;
+  background: transparent;
+  outline: none;
+  color: #fff;
+}
+.footer-form__input::placeholder {
+  color: #9ca8b1;
+  font-size: 1.4rem;
+  line-height: 185.7%;
+  padding: 10px;
+}
+.footer-form__submit {
+  width: 108px;
+  height: 46px;
+  border: none;
+  border-radius: 4px;
+  background: #2e80ce;
+  cursor: pointer;
+  color: #fff;
+  font-size: 1.4rem;
+  font-weight: 600;
+  line-height: 185.7%;
+}
+.footer__copyright {
+  border-top: 1px solid #406181;
+}
+.footer__copyright--text {
+  color: #aab3ba;
+  text-align: center;
+  font-size: 1.4rem;
+  font-style: normal;
+  line-height: 185.7%;
+  padding:  28px 0 42px;
 }
