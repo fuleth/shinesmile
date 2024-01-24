@@ -486,3 +486,28 @@ a {
 .blog-item__more:hover {
   color: #2e80ce;
 }
+/* =================cta============== */
+.cta {
+  padding: 85px 0;
+}
+.cta__inner {
+  background: #f6fbff;
+  padding: 100px 178px 115px;
+  text-align: center;
+}
+.cta__heading::after {
+  margin: 18px auto 0;
+  content: " ";
+  display: block;
+  width: 136px;
+  height: 2px;
+  background: #2e80ce;
+}
+.cta__desc {
+  width: 617px;
+  color: #575f66;
+  font-size: 1.6rem;
+  font-weight: 300;
+  line-height: 175%;
+  margin: 18px auto 38px;
+}
