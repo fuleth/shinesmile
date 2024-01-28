@@ -3,6 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
     <link
       rel="apple-touch-icon"
       sizes="57x57"
@@ -164,7 +165,7 @@
               <img
                 src="./assets/img/service1.jpg"
                 alt="Our services"
-                class="service__img"
+                class="service__img" data-aos="flip-left"
               />
             </figure>
             <!-- right -->
@@ -560,5 +561,9 @@
         </div>
       </div>
     </footer>
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+    <script>
+      AOS.init();
+    </script>
   </body>
 </html>
