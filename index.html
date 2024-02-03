@@ -3,7 +3,10 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+    <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
+  />
     <link
       rel="apple-touch-icon"
       sizes="57x57"
@@ -88,6 +91,7 @@
     />
     <link rel="stylesheet" href="./assets/css/reset.css" />
     <link rel="stylesheet" href="./assets/css/style.css" />
+    <link rel="stylesheet" href="./assets/css/responsive.css" />
     <title>Shine smile</title>
   </head>
   <body">
@@ -96,7 +100,7 @@
       <div class="container">
         <div class="header-top">
           <a href="./"
-            ><img src="./assets/img/logo.svg" alt="shine smile" class="logo"
+            ><img src="./assets/img/logo.svg" alt="shine smile" class="logo header__logo"
           /></a>
           <nav class="navbar">
             <ul class="navbar__list">
@@ -149,6 +153,17 @@
         </section>
       </div>
     </header>
+    <!-- tablet&mobie header -->
+    <div class="mobie-header">
+      <input type="checkbox" name="menu-checkbox" id="menu-checkbox" class="menu-checkbox" hidden>
+      <label for="menu-checkbox">
+        <svg class="menu-header__icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
+          <path fill="currentColor" d="M0 96C0 78.3 14.3 64 32 64H416c17
+        .7 0 32 14.3 32 32s-14.3 32-32 32H32C14.3 128 0 113.7 0 96zM0 256c0-17.7 14.3-32 32-32H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32c-17.7 0-32-14.3-32-32zM448 416c0 17.7-14.3 32-32 32H32c-17.7 0-32-14.3-32-32s14.3-32 32-32H416c17.7 0 32 14.3 32 32z"/>
+        </svg> 
+      </label>
+      <label for="menu-checkbox" class="menu-overlay"></label>
+    </div>
     <!-- main -->
     <main>
       <!-- service -->
@@ -165,7 +180,7 @@
               <img
                 src="./assets/img/service1.jpg"
                 alt="Our services"
-                class="service__img" data-aos="flip-left"
+                 class="service__img" 
               />
             </figure>
             <!-- right -->
@@ -561,9 +576,5 @@
         </div>
       </div>
     </footer>
-    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
-    <script>
-      AOS.init();
-    </script>
   </body>
 </html>
