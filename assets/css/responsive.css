@@ -68,6 +68,33 @@
     .navbar__link:hover{
         background: #617ab4;
     }
+    .hero{
+        flex-direction: column;
+        gap: 50px;
+    }
+    .hero__content{
+        order: 2;
+        width: 80%;
+        margin: 22px auto;
+        text-align: center;
+    }
+    .hero__row{
+        justify-content: center;
+    }
+    .hero__media{
+        order: 1;
+    }
+    .service__row{
+        flex-direction: column;
+        gap: 20px;
+    }
+    .service-item{
+        width: 90%;
+        text-align: start;
+    }
+    .service__list{
+        text-align: center;
+    }
 }
 /* Tablet  */
 @media(min-width:768px) and (max-width: 991.98px) {
@@ -78,6 +105,6 @@
     
 }
 /* hidden */
-.hero,.footer,main{
+.footer{
     display: none;
 }
