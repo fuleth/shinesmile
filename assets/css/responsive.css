@@ -1,6 +1,8 @@
 /* PC */
 @media(min-width: 992px) {
-    
+    .mobie-header{
+        display: none;
+    }
 }
 /* Tablet & mobie */
 @media(max-width: 991.98px) {
@@ -34,6 +36,37 @@
     #menu-checkbox:checked ~ .menu-overlay{
         opacity: 1;
         visibility: visible;
+    }
+    .menu-drawer{
+        position: fixed;
+        background: brown;
+        inset: 0 40% 0 0;
+        z-index: 2;
+        transform: translateX(-100%);
+        transition: 0.25s;
+        padding: 60px;
+    }
+    .menu-checkbox:checked ~.menu-drawer{
+        transform: translateX(0);
+    }
+    .close__menu{
+        width: 24px;
+        color: #FFF;     
+    }
+    .menu-drawer__top{
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    #navbar__list--mobie{
+        margin-top: 25px;
+    }
+    .navbar__link{
+        display: block;
+        font-size: 2rem;
+    }
+    .navbar__link:hover{
+        background: #617ab4;
     }
 }
 /* Tablet  */
