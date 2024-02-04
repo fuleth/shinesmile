@@ -95,6 +95,20 @@
     .service__list{
         text-align: center;
     }
+    .work__list{
+        grid-template-columns: 1fr;
+    }
+    .about-row{
+        flex-direction: column;
+        gap: 30px;
+    }
+    .about__img--small{
+        display: none;
+    }
+    .about-content{
+        width: 90%;
+        text-align: center;
+    }
 }
 /* Tablet  */
 @media(min-width:768px) and (max-width: 991.98px) {
