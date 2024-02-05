@@ -109,6 +109,22 @@
         width: 90%;
         text-align: center;
     }
+    .team__list{
+        grid-template-columns: repeat(2,1fr);
+    }
+    .team-item__thumb{
+        margin: 0 auto;
+    }
+    .mobie__inner{
+        gap: 0;
+    }
+    .mobie__img{
+        display: none;
+    }
+    .mobie__content{
+        width: 90%;
+        margin: 0 auto;
+    }
 }
 /* Tablet  */
 @media(min-width:768px) and (max-width: 991.98px) {

@@ -394,7 +394,7 @@ a {
   bottom: 0;
 }
 .mobie__content {
-  max-width: 586px;
+  min-width: 586px;
 }
 .mobie__heading {
   color: #fff;
