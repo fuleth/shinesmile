@@ -618,135 +618,107 @@ a {
   line-height: 185.7%;
   padding: 28px 0 42px;
 }
-/* =================cta============== */
-.appointment-card {
-  border-radius: 12px;
-  background: #ffffff;
-  padding: 20px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
-  margin-bottom: 20px;
-  transition: transform 0.25s;
-}
-
-.appointment-card:hover {
-  transform: translateY(-4px);
-}
-
-.appointment-card h4 {
-  font-size: 1.8rem;
-  color: #10375c;
-  margin: 0;
-}
-
-.appointment-meta p {
-  font-size: 1.4rem;
-  color: #555;
-  margin: 4px 0;
-}
-
-.appointment-status {
-  padding: 5px 10px;
-  border-radius: 8px;
-  font-size: 1.2rem;
-  font-weight: 600;
-  color: #fff;
-  text-transform: capitalize;
-}
-
-.status-pending {
-  background: linear-gradient(45deg, #f57c00, #ff9800);
-}
-.status-confirmed {
-  background: linear-gradient(45deg, #2e7d32, #66bb6a);
-}
-.status-cancelled {
-  background: linear-gradient(45deg, #c62828, #ef5350);
-}
-.status-completed {
-  background: linear-gradient(45deg, #1565c0, #42a5f5);
-}
-
-.appointment-actions {
-  margin-top: 15px;
-}
-
-.appointment-actions button {
-  padding: 6px 14px;
-  font-size: 1.4rem;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  color: white;
-  margin-right: 10px;
-}
-
-.appointment-actions .cancel-btn {
-  background-color: #f44336;
-}
-.appointment-actions .edit-btn {
-  background-color: #2196f3;
-}
+/* ==== Appointments Table ==== */
 .appointments-table {
   width: 100%;
   border-collapse: collapse;
-  background: #fff;
+  margin-top: 20px;
+  background-color: #fff;
   border-radius: 10px;
   overflow: hidden;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  table-layout: fixed;
 }
 
 .appointments-table thead {
   background-color: #10375c;
   color: white;
-  text-align: left;
+  font-size: 1.6rem;
 }
 
 .appointments-table th,
 .appointments-table td {
-  padding: 16px 20px;
-  font-size: 1.4rem;
-  border-bottom: 1px solid #eee;
+  text-align: center;
+  vertical-align: middle;
+  padding: 14px 12px;
+  font-size: 1.5rem;
+  border-bottom: 1px solid #ddd;
+  color: #000;
+  word-wrap: break-word;
 }
 
 .appointments-table tbody tr:hover {
   background-color: #f9f9f9;
 }
 
+/* ==== Status styles ==== */
 .appointments-table .status {
-  padding: 4px 10px;
+  display: inline-block;
+  padding: 6px 12px;
+  font-size: 1.3rem;
   border-radius: 6px;
-  font-weight: 500;
-  font-size: 1.2rem;
-  color: #fff;
+  min-width: 90px;
+  font-weight: 600;
+  text-align: center;
+  color: white;
   text-transform: capitalize;
 }
 
 .status-pending {
-  background-color: #f57c00;
+  background-color: #ff9800;
 }
-
+.status-cancelled {
+  background-color: #e53935;
+}
+.status-completed {
+  background-color: #1e88e5;
+}
 .status-confirmed {
   background-color: #4caf50;
 }
 
-.status-cancelled {
-  background-color: #e53935;
+/* ==== Action buttons ==== */
+.appointment-actions {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
 }
 
-.status-completed {
-  background-color: #1e88e5;
-}
-
-.cancel-btn {
-  background-color: #f44336;
-  color: white;
+.appointment-actions button {
+  padding: 8px 16px;
+  font-size: 1.4rem;
   border: none;
   border-radius: 6px;
-  padding: 6px 12px;
   cursor: pointer;
-  font-size: 1.3rem;
+  color: white;
+  transition: background-color 0.25s;
 }
 
-.cancel-btn:hover {
+.update-btn {
+  background-color: #2196f3;
+}
+.update-btn:hover {
+  background-color: #1976d2;
+}
+
+.delete-btn {
+  background-color: #f44336;
+}
+.delete-btn:hover {
   background-color: #d32f2f;
+}
+
+/* ==== Refresh button ==== */
+.refresh-btn {
+  margin-top: 30px;
+  padding: 14px 24px;
+  font-size: 1.6rem;
+  border-radius: 30px;
+  background: #2e80ce;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+.refresh-btn:hover {
+  opacity: 0.9;
 }

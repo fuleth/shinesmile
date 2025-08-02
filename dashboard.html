@@ -261,7 +261,7 @@
 
         try {
           const response = await fetch(
-            `/api/appointments/${appointmentId}/cancel`,
+            `http://localhost:5000/api/appointments/appointments/${appointmentId}/cancel`,
             {
               method: "PATCH",
               headers: {

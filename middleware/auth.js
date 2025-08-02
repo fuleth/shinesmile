@@ -1,19 +1,21 @@
-const jwt = require('jsonwebtoken');
-const User = require('../models/User');
+const jwt = require("jsonwebtoken");
+const User = require("../models/User");
 
 const auth = async (req, res, next) => {
   try {
-    const token = req.header('Authorization')?.replace('Bearer ', '');
-    
+    const token = req.header("Authorization")?.replace("Bearer ", "");
+
     if (!token) {
-      return res.status(401).json({ message: 'Access denied. No token provided.' });
+      return res
+        .status(401)
+        .json({ message: "Access denied. No token provided." });
     }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const user = await User.findById(decoded.userId);
-    
+
     if (!user) {
-      return res.status(401).json({ message: 'Invalid token.' });
+      return res.status(401).json({ message: "Invalid token." });
     }
 
     // Remove password from user object
@@ -21,8 +23,36 @@ const auth = async (req, res, next) => {
     req.user = userWithoutPassword;
     next();
   } catch (error) {
-    res.status(401).json({ message: 'Invalid token.' });
+    res.status(401).json({ message: "Invalid token." });
   }
 };
 
-module.exports = auth; 
+const adminAuth = async (req, res, next) => {
+  try {
+    const token = req.header("Authorization")?.replace("Bearer ", "");
+
+    if (!token) {
+      return res
+        .status(401)
+        .json({ message: "Access denied. No token provided." });
+    }
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const user = await User.findById(decoded.userId);
+
+    if (!user || user.role !== "admin") {
+      return res
+        .status(403)
+        .json({ message: "Forbidden: Admin access required." });
+    }
+
+    // Remove password from user object
+    const { password, ...userWithoutPassword } = user;
+    req.user = userWithoutPassword;
+    next();
+  } catch (error) {
+    res.status(401).json({ message: "Invalid token." });
+  }
+};
+
+module.exports = { auth, adminAuth };
