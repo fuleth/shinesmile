@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Register | Shine Smile</title>
+    <link rel="stylesheet" href="./assets/css/reset.css" />
+    <link rel="stylesheet" href="./assets/css/style.css" />
+  </head>
+  <body class="header">
+    <div class="container">
+      <div class="header-top">
+        <a href="./"
+          ><img
+            src="./assets/img/logo.svg"
+            alt="shine smile"
+            class="logo header__logo"
+        /></a>
+        <nav class="navbar">
+          <ul class="navbar__list" id="navbar__list--pc">
+            <li class="navbar__item">
+              <a href="./index.html" class="navbar__link navbar__link--active"
+                >Home</a
+              >
+            </li>
+            <li class="navbar__item">
+              <a href="./services.html" class="navbar__link">Services</a>
+            </li>
+            <li class="navbar__item">
+              <a href="#!" class="navbar__link">About</a>
+            </li>
+            <li class="navbar__item">
+              <a href="#!" class="navbar__link">Doctors</a>
+            </li>
+          </ul>
+        </nav>
+        <div class="header__action">
+          <a href="./login.html" class="header__action--login">Log In</a>
+          <a href="./register.html" class="btn header__action--sign-up"
+            >Sign Up</a
+          >
+        </div>
+      </div>
+      <form
+        id="registerForm"
+        class="about-content"
+        style="
+          background: #fff;
+          padding: 40px;
+          border-radius: 10px;
+          margin: 60px auto;
+          max-width: 400px;
+        "
+      >
+        <h2 class="section-heading" style="font-size: 3rem; text-align: center">
+          Sign Up
+        </h2>
+        <input
+          type="text"
+          id="username"
+          placeholder="Username"
+          required
+          style="
+            margin-top: 20px;
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+          "
+        />
+        <input
+          type="text"
+          id="fullName"
+          placeholder="Full Name"
+          required
+          style="
+            margin-top: 20px;
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+          "
+        />
+        <input
+          type="email"
+          id="email"
+          placeholder="Email"
+          required
+          style="
+            margin-top: 20px;
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+          "
+        />
+        <input
+          type="tel"
+          id="phone"
+          placeholder="Phone Number (optional)"
+          style="
+            margin-top: 20px;
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+          "
+        />
+        <input
+          type="password"
+          id="password"
+          placeholder="Password"
+          required
+          minlength="6"
+          style="
+            margin-top: 20px;
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+          "
+        />
+        <button type="submit" class="btn" style="margin-top: 20px; width: 100%">
+          Create an account
+        </button>
+        <div
+          id="message"
+          style="
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+            display: none;
+          "
+        ></div>
+        <p style="text-align: center; margin-top: 20px; color: #10375c">
+          Already have an account?
+          <a href="login.html" style="color: #2e80ce">Log in</a>
+        </p>
+      </form>
+    </div>
+
+    <script>
+      const registerForm = document.getElementById("registerForm");
+      const messageDiv = document.getElementById("message");
+
+      registerForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const formData = {
+          username: document.getElementById("username").value,
+          fullName: document.getElementById("fullName").value,
+          email: document.getElementById("email").value,
+          phone: document.getElementById("phone").value,
+          password: document.getElementById("password").value,
+        };
+
+        try {
+          const response = await fetch(
+            "http://localhost:5000/api/auth/register",
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(formData),
+            }
+          );
+
+          const data = await response.json();
+
+          if (response.ok) {
+            // Store token and user info
+            localStorage.setItem("token", data.token);
+            localStorage.setItem("user", JSON.stringify(data.user));
+
+            showMessage("Registration successful! Redirecting...", "success");
+
+            // Redirect to services page after a short delay
+            setTimeout(() => {
+              window.location.href = "./services.html";
+            }, 1500);
+          } else {
+            if (data.errors) {
+              const errorMessage = data.errors
+                .map((error) => error.msg)
+                .join(", ");
+              showMessage(errorMessage, "error");
+            } else {
+              showMessage(data.message || "Registration failed", "error");
+            }
+          }
+        } catch (error) {
+          console.error("Error:", error);
+          showMessage("Network error. Please try again.", "error");
+        }
+      });
+
+      function showMessage(message, type) {
+        messageDiv.textContent = message;
+        messageDiv.style.display = "block";
+        messageDiv.style.backgroundColor =
+          type === "success" ? "#e8f5e8" : "#ffebee";
+        messageDiv.style.color = type === "success" ? "#2e7d32" : "#c62828";
+      }
+    </script>
+  </body>
+</html>
