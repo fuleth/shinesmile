@@ -616,9 +616,9 @@ a {
   font-size: 1.4rem;
   font-style: normal;
   line-height: 185.7%;
-  padding:  28px 0 42px;
+  padding: 28px 0 42px;
 }
-
+/* =================cta============== */
 .appointment-card {
   border-radius: 12px;
   background: #ffffff;
