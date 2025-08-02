@@ -88,6 +88,18 @@ class User {
   static async comparePassword(password, hashedPassword) {
     return await bcrypt.compare(password, hashedPassword);
   }
+
+  static async findAll() {
+    try {
+      const pool = await getPool();
+      const result = await pool.request()
+        .query('SELECT id, username, email, fullName, phone, role, createdAt FROM Users ORDER BY createdAt DESC');
+      
+      return result.recordset;
+    } catch (error) {
+      throw error;
+    }
+  }
 }
 
 module.exports = User; 

@@ -8,6 +8,7 @@ const { connectDB } = require('./config/database');
 // Import routes
 const authRoutes = require('./routes/auth');
 const appointmentRoutes = require('./routes/appointments');
+const adminRoutes = require('./routes/admin');
 
 const app = express();
 
@@ -29,6 +30,7 @@ connectDB()
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/appointments', appointmentRoutes);
+app.use('/api/admin', adminRoutes);
 
 // Serve HTML files
 app.get('/', (req, res) => {
@@ -49,6 +51,10 @@ app.get('/services', (req, res) => {
 
 app.get('/dashboard', (req, res) => {
   res.sendFile(path.join(__dirname, 'dashboard.html'));
+});
+
+app.get('/admin', (req, res) => {
+  res.sendFile(path.join(__dirname, 'admin.html'));
 });
 
 const PORT = process.env.PORT || 5000;

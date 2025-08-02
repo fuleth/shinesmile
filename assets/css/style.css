@@ -616,5 +616,138 @@ a {
   font-size: 1.4rem;
   font-style: normal;
   line-height: 185.7%;
-  padding:  28px 0 42px;
+  padding: 28px 0 42px;
+}
+/* =================appointment============== */
+
+.appointment-card {
+  border-radius: 12px;
+  background: #ffffff;
+  padding: 20px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+  margin-bottom: 20px;
+  transition: transform 0.25s;
+}
+
+.appointment-card:hover {
+  transform: translateY(-4px);
+}
+
+.appointment-card h4 {
+  font-size: 1.8rem;
+  color: #10375c;
+  margin: 0;
+}
+
+.appointment-meta p {
+  font-size: 1.4rem;
+  color: #555;
+  margin: 4px 0;
+}
+
+.appointment-status {
+  padding: 5px 10px;
+  border-radius: 8px;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #fff;
+  text-transform: capitalize;
+}
+
+.status-pending {
+  background: linear-gradient(45deg, #f57c00, #ff9800);
+}
+.status-confirmed {
+  background: linear-gradient(45deg, #2e7d32, #66bb6a);
+}
+.status-cancelled {
+  background: linear-gradient(45deg, #c62828, #ef5350);
+}
+.status-completed {
+  background: linear-gradient(45deg, #1565c0, #42a5f5);
+}
+
+.appointment-actions {
+  margin-top: 15px;
+}
+
+.appointment-actions button {
+  padding: 6px 14px;
+  font-size: 1.4rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  color: white;
+  margin-right: 10px;
+}
+
+.appointment-actions .cancel-btn {
+  background-color: #f44336;
+}
+.appointment-actions .edit-btn {
+  background-color: #2196f3;
+}
+.appointments-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+}
+
+.appointments-table thead {
+  background-color: #10375c;
+  color: white;
+  text-align: left;
+}
+
+.appointments-table th,
+.appointments-table td {
+  padding: 16px 20px;
+  font-size: 1.4rem;
+  border-bottom: 1px solid #eee;
+}
+
+.appointments-table tbody tr:hover {
+  background-color: #f9f9f9;
+}
+
+.appointments-table .status {
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-weight: 500;
+  font-size: 1.2rem;
+  color: #fff;
+  text-transform: capitalize;
+}
+
+.status-pending {
+  background-color: #f57c00;
+}
+
+.status-confirmed {
+  background-color: #4caf50;
+}
+
+.status-cancelled {
+  background-color: #e53935;
+}
+
+.status-completed {
+  background-color: #1e88e5;
+}
+
+.cancel-btn {
+  background-color: #f44336;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 12px;
+  cursor: pointer;
+  font-size: 1.3rem;
+}
+
+.cancel-btn:hover {
+  background-color: #d32f2f;
 }

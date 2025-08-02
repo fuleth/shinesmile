@@ -173,6 +173,28 @@ class Appointment {
       throw error;
     }
   }
+
+  static async getStatistics() {
+    try {
+      const pool = await getPool();
+      const result = await pool.request()
+        .query(`
+          SELECT 
+            COUNT(*) as totalAppointments,
+            COUNT(CASE WHEN status = 'pending' THEN 1 END) as pendingAppointments,
+            COUNT(CASE WHEN status = 'confirmed' THEN 1 END) as confirmedAppointments,
+            COUNT(CASE WHEN status = 'completed' THEN 1 END) as completedAppointments,
+            COUNT(CASE WHEN status = 'cancelled' THEN 1 END) as cancelledAppointments,
+            COUNT(CASE WHEN appointmentDate >= GETDATE() THEN 1 END) as upcomingAppointments,
+            COUNT(CASE WHEN appointmentDate < GETDATE() THEN 1 END) as pastAppointments
+          FROM Appointments
+        `);
+      
+      return result.recordset[0];
+    } catch (error) {
+      throw error;
+    }
+  }
 }
 
 module.exports = Appointment; 

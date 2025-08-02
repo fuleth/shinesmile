@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Dashboard | Shine Smile</title>
+    <link rel="stylesheet" href="./assets/css/reset.css" />
+    <link rel="stylesheet" href="./assets/css/style.css" />
+    <style>
+      .admin-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+      
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+        margin-bottom: 30px;
+      }
+      
+      .stat-card {
+        background: #fff;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        text-align: center;
+      }
+      
+      .stat-number {
+        font-size: 2rem;
+        font-weight: bold;
+        color: #2e80ce;
+        margin-bottom: 5px;
+      }
+      
+      .stat-label {
+        color: #666;
+        font-size: 0.9rem;
+      }
+      
+      .admin-actions {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+      }
+      
+      .btn-secondary {
+        background: #6c757d;
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 0.9rem;
+      }
+      
+      .btn-secondary:hover {
+        background: #5a6268;
+      }
+      
+      .status-filter {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+      }
+      
+      .filter-btn {
+        padding: 8px 16px;
+        border: 1px solid #ddd;
+        background: white;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 0.9rem;
+      }
+      
+      .filter-btn.active {
+        background: #2e80ce;
+        color: white;
+        border-color: #2e80ce;
+      }
+      
+      .appointments-table {
+        width: 100%;
+        border-collapse: collapse;
+        background: white;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      }
+      
+      .appointments-table th,
+      .appointments-table td {
+        padding: 12px;
+        text-align: left;
+        border-bottom: 1px solid #eee;
+      }
+      
+      .appointments-table th {
+        background: #f8f9fa;
+        font-weight: 600;
+        color: #333;
+      }
+      
+      .status {
+        padding: 4px 8px;
+        border-radius: 12px;
+        font-size: 0.8rem;
+        font-weight: 500;
+      }
+      
+      .status-pending { background: #fff3cd; color: #856404; }
+      .status-confirmed { background: #d1ecf1; color: #0c5460; }
+      .status-completed { background: #d4edda; color: #155724; }
+      .status-cancelled { background: #f8d7da; color: #721c24; }
+      
+      .action-buttons {
+        display: flex;
+        gap: 5px;
+        flex-wrap: wrap;
+      }
+      
+      .btn-small {
+        padding: 4px 8px;
+        font-size: 0.8rem;
+        border: none;
+        border-radius: 3px;
+        cursor: pointer;
+      }
+      
+      .btn-edit { background: #ffc107; color: #000; }
+      .btn-delete { background: #dc3545; color: white; }
+      .btn-status { background: #17a2b8; color: white; }
+      
+      .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0,0,0,0.5);
+      }
+      
+      .modal-content {
+        background-color: white;
+        margin: 5% auto;
+        padding: 20px;
+        border-radius: 10px;
+        width: 90%;
+        max-width: 500px;
+      }
+      
+      .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+      }
+      
+      .close {
+        font-size: 28px;
+        font-weight: bold;
+        cursor: pointer;
+        color: #aaa;
+      }
+      
+      .close:hover {
+        color: #000;
+      }
+      
+      .form-group {
+        margin-bottom: 15px;
+      }
+      
+      .form-group label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: 500;
+      }
+      
+      .form-group input,
+      .form-group select,
+      .form-group textarea {
+        width: 100%;
+        padding: 8px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        font-size: 14px;
+      }
+      
+      .form-group textarea {
+        height: 80px;
+        resize: vertical;
+      }
+      
+      .modal-actions {
+        display: flex;
+        gap: 10px;
+        justify-content: flex-end;
+        margin-top: 20px;
+      }
+      
+      .no-access {
+        text-align: center;
+        padding: 40px;
+        color: #666;
+      }
+      
+      .no-access h2 {
+        color: #dc3545;
+        margin-bottom: 10px;
+      }
+    </style>
+  </head>
+  <body class="header">
+    <div class="container">
+      <div class="header-top">
+        <a href="./"
+          ><img
+            src="./assets/img/logo.svg"
+            alt="shine smile"
+            class="logo header__logo"
+        /></a>
+        <nav class="navbar">
+          <ul class="navbar__list" id="navbar__list--pc">
+            <li class="navbar__item">
+              <a href="./index.html" class="navbar__link">Home</a>
+            </li>
+            <li class="navbar__item">
+              <a href="./services.html" class="navbar__link">Services</a>
+            </li>
+            <li class="navbar__item">
+              <a href="#!" class="navbar__link">About</a>
+            </li>
+            <li class="navbar__item">
+              <a href="#!" class="navbar__link">Doctors</a>
+            </li>
+          </ul>
+        </nav>
+        <div class="header__action">
+          <span id="userInfo" style="color: #fff; margin-right: 20px"></span>
+          <button id="logoutBtn" class="btn header__action--sign-up">
+            Logout
+          </button>
+        </div>
+      </div>
+
+      <div class="admin-container">
+        <div id="noAccessMessage" class="no-access" style="display: none;">
+          <h2>Access Denied</h2>
+          <p>You don't have permission to access the admin dashboard.</p>
+          <a href="./dashboard.html" class="btn">Go to User Dashboard</a>
+        </div>
+
+        <div id="adminContent" style="display: none;">
+          <h2 class="section-heading" style="font-size: 3rem; text-align: center; margin-bottom: 40px">
+            Admin Dashboard
+          </h2>
+
+          <div id="statsGrid" class="stats-grid">
+            <!-- Statistics will be loaded here -->
+          </div>
+
+          <div class="admin-actions">
+            <button id="refreshBtn" class="btn">Refresh Data</button>
+            <button id="exportBtn" class="btn-secondary">Export Data</button>
+          </div>
+
+          <div class="status-filter">
+            <button class="filter-btn active" data-status="all">All</button>
+            <button class="filter-btn" data-status="pending">Pending</button>
+            <button class="filter-btn" data-status="confirmed">Confirmed</button>
+            <button class="filter-btn" data-status="completed">Completed</button>
+            <button class="filter-btn" data-status="cancelled">Cancelled</button>
+          </div>
+
+          <div id="appointmentsContainer">
+            <div id="loadingMessage" style="text-align: center; color: #666; padding: 40px;">
+              Loading appointments...
+            </div>
+          </div>
+        </div>
+
+        <div id="message" style="margin-top: 20px; padding: 10px; border-radius: 5px; text-align: center; display: none;"></div>
+      </div>
+    </div>
+
+    <!-- Edit Appointment Modal -->
+    <div id="editModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>Edit Appointment</h3>
+          <span class="close">&times;</span>
+        </div>
+        <form id="editForm">
+          <div class="form-group">
+            <label for="editFullName">Full Name</label>
+            <input type="text" id="editFullName" required>
+          </div>
+          <div class="form-group">
+            <label for="editEmail">Email</label>
+            <input type="email" id="editEmail" required>
+          </div>
+          <div class="form-group">
+            <label for="editPhone">Phone</label>
+            <input type="tel" id="editPhone" required>
+          </div>
+          <div class="form-group">
+            <label for="editService">Service</label>
+            <select id="editService" required>
+              <option value="cleaning">Cleaning</option>
+              <option value="whitening">Whitening</option>
+              <option value="braces">Braces</option>
+              <option value="implants">Implants</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="editDate">Date</label>
+            <input type="date" id="editDate" required>
+          </div>
+          <div class="form-group">
+            <label for="editTimeSlot">Time Slot</label>
+            <select id="editTimeSlot" required>
+              <option value="09:00 AM">09:00 AM</option>
+              <option value="09:30 AM">09:30 AM</option>
+              <option value="10:00 AM">10:00 AM</option>
+              <option value="10:30 AM">10:30 AM</option>
+              <option value="11:00 AM">11:00 AM</option>
+              <option value="11:30 AM">11:30 AM</option>
+              <option value="02:00 PM">02:00 PM</option>
+              <option value="02:30 PM">02:30 PM</option>
+              <option value="03:00 PM">03:00 PM</option>
+              <option value="03:30 PM">03:30 PM</option>
+              <option value="04:00 PM">04:00 PM</option>
+              <option value="04:30 PM">04:30 PM</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="editStatus">Status</label>
+            <select id="editStatus" required>
+              <option value="pending">Pending</option>
+              <option value="confirmed">Confirmed</option>
+              <option value="completed">Completed</option>
+              <option value="cancelled">Cancelled</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="editNotes">Notes</label>
+            <textarea id="editNotes"></textarea>
+          </div>
+          <div class="modal-actions">
+            <button type="button" class="btn-secondary" onclick="closeEditModal()">Cancel</button>
+            <button type="submit" class="btn">Save Changes</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <script>
+      const token = localStorage.getItem("token");
+      const user = JSON.parse(localStorage.getItem("user") || "{}");
+      const noAccessMessage = document.getElementById("noAccessMessage");
+      const adminContent = document.getElementById("adminContent");
+      const userInfo = document.getElementById("userInfo");
+      const logoutBtn = document.getElementById("logoutBtn");
+      const messageDiv = document.getElementById("message");
+      const statsGrid = document.getElementById("statsGrid");
+      const appointmentsContainer = document.getElementById("appointmentsContainer");
+      const loadingMessage = document.getElementById("loadingMessage");
+      const refreshBtn = document.getElementById("refreshBtn");
+      const exportBtn = document.getElementById("exportBtn");
+      const editModal = document.getElementById("editModal");
+      const editForm = document.getElementById("editForm");
+      let currentAppointments = [];
+      let currentFilter = 'all';
+
+      // Check if user is logged in and has admin role
+      if (!token) {
+        window.location.href = "./login.html";
+      } else if (user.role !== 'admin') {
+        noAccessMessage.style.display = "block";
+        adminContent.style.display = "none";
+      } else {
+        noAccessMessage.style.display = "none";
+        adminContent.style.display = "block";
+        userInfo.textContent = `Admin: ${user.fullName || user.username || "User"}`;
+        loadAdminData();
+      }
+
+      // Logout functionality
+      logoutBtn.addEventListener("click", () => {
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        window.location.href = "./login.html";
+      });
+
+      // Refresh button
+      refreshBtn.addEventListener("click", () => {
+        loadAdminData();
+      });
+
+      // Export button
+      exportBtn.addEventListener("click", () => {
+        exportAppointments();
+      });
+
+      // Filter buttons
+      document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          currentFilter = btn.dataset.status;
+          filterAppointments();
+        });
+      });
+
+      async function loadAdminData() {
+        try {
+          // Load statistics
+          const statsResponse = await fetch("http://localhost:5000/api/admin/statistics", {
+            headers: { Authorization: `Bearer ${token}` }
+          });
+
+          if (statsResponse.ok) {
+            const stats = await statsResponse.json();
+            displayStatistics(stats.statistics);
+          }
+
+          // Load appointments
+          const appointmentsResponse = await fetch("http://localhost:5000/api/admin/appointments", {
+            headers: { Authorization: `Bearer ${token}` }
+          });
+
+          if (appointmentsResponse.ok) {
+            const data = await appointmentsResponse.json();
+            currentAppointments = data.appointments;
+            displayAppointments(currentAppointments);
+          } else {
+            showMessage("Failed to load data", "error");
+          }
+        } catch (error) {
+          console.error("Error:", error);
+          showMessage("Network error. Please try again.", "error");
+        }
+      }
+
+      function displayStatistics(stats) {
+        statsGrid.innerHTML = `
+          <div class="stat-card">
+            <div class="stat-number">${stats.totalAppointments}</div>
+            <div class="stat-label">Total Appointments</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number">${stats.pendingAppointments}</div>
+            <div class="stat-label">Pending</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number">${stats.confirmedAppointments}</div>
+            <div class="stat-label">Confirmed</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number">${stats.completedAppointments}</div>
+            <div class="stat-label">Completed</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number">${stats.cancelledAppointments}</div>
+            <div class="stat-label">Cancelled</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number">${stats.upcomingAppointments}</div>
+            <div class="stat-label">Upcoming</div>
+          </div>
+        `;
+      }
+
+      function displayAppointments(appointments) {
+        loadingMessage.style.display = "none";
+
+        if (appointments.length === 0) {
+          appointmentsContainer.innerHTML = '<div style="text-align: center; color: #666; padding: 40px;">No appointments found.</div>';
+          return;
+        }
+
+        const tableHeader = `
+          <table class="appointments-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Patient Name</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Service</th>
+                <th>Date</th>
+                <th>Time</th>
+                <th>Status</th>
+                <th>Notes</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+        `;
+
+        const tableBody = appointments
+          .map((a) => {
+            const date = new Date(a.appointmentDate).toLocaleDateString();
+            const status = a.status || "pending";
+
+            return `
+              <tr>
+                <td>${a.id}</td>
+                <td>${a.fullName}</td>
+                <td>${a.email}</td>
+                <td>${a.phone}</td>
+                <td>${a.service}</td>
+                <td>${date}</td>
+                <td>${a.timeSlot}</td>
+                <td><span class="status status-${status}">${status}</span></td>
+                <td>${a.notes || '-'}</td>
+                <td>
+                  <div class="action-buttons">
+                    <button class="btn-small btn-edit" onclick="editAppointment('${a.id}')">Edit</button>
+                    <button class="btn-small btn-status" onclick="changeStatus('${a.id}')">Status</button>
+                    <button class="btn-small btn-delete" onclick="deleteAppointment('${a.id}')">Delete</button>
+                  </div>
+                </td>
+              </tr>
+            `;
+          })
+          .join("");
+
+        const tableFooter = `
+            </tbody>
+          </table>
+        `;
+
+        appointmentsContainer.innerHTML = tableHeader + tableBody + tableFooter;
+      }
+
+      function filterAppointments() {
+        if (currentFilter === 'all') {
+          displayAppointments(currentAppointments);
+        } else {
+          const filtered = currentAppointments.filter(a => a.status === currentFilter);
+          displayAppointments(filtered);
+        }
+      }
+
+      async function editAppointment(appointmentId) {
+        try {
+          const response = await fetch(`http://localhost:5000/api/admin/appointments/${appointmentId}`, {
+            headers: { Authorization: `Bearer ${token}` }
+          });
+
+          if (response.ok) {
+            const data = await response.json();
+            const appointment = data.appointment;
+            
+            // Populate form
+            document.getElementById('editFullName').value = appointment.fullName;
+            document.getElementById('editEmail').value = appointment.email;
+            document.getElementById('editPhone').value = appointment.phone;
+            document.getElementById('editService').value = appointment.service;
+            document.getElementById('editDate').value = appointment.appointmentDate.split('T')[0];
+            document.getElementById('editTimeSlot').value = appointment.timeSlot;
+            document.getElementById('editStatus').value = appointment.status;
+            document.getElementById('editNotes').value = appointment.notes || '';
+            
+            // Store appointment ID for form submission
+            editForm.dataset.appointmentId = appointmentId;
+            
+            editModal.style.display = "block";
+          } else {
+            showMessage("Failed to load appointment details", "error");
+          }
+        } catch (error) {
+          console.error("Error:", error);
+          showMessage("Network error. Please try again.", "error");
+        }
+      }
+
+      async function changeStatus(appointmentId) {
+        const newStatus = prompt("Enter new status (pending/confirmed/completed/cancelled):");
+        if (!newStatus) return;
+
+        if (!['pending', 'confirmed', 'completed', 'cancelled'].includes(newStatus.toLowerCase())) {
+          showMessage("Invalid status", "error");
+          return;
+        }
+
+        try {
+          const response = await fetch(`http://localhost:5000/api/admin/appointments/${appointmentId}/status`, {
+            method: "PATCH",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`
+            },
+            body: JSON.stringify({ status: newStatus.toLowerCase() })
+          });
+
+          if (response.ok) {
+            showMessage("Status updated successfully", "success");
+            loadAdminData();
+          } else {
+            const data = await response.json();
+            showMessage(data.message || "Failed to update status", "error");
+          }
+        } catch (error) {
+          console.error("Error:", error);
+          showMessage("Network error. Please try again.", "error");
+        }
+      }
+
+      async function deleteAppointment(appointmentId) {
+        if (!confirm("Are you sure you want to delete this appointment?")) {
+          return;
+        }
+
+        try {
+          const response = await fetch(`http://localhost:5000/api/admin/appointments/${appointmentId}`, {
+            method: "DELETE",
+            headers: { Authorization: `Bearer ${token}` }
+          });
+
+          if (response.ok) {
+            showMessage("Appointment deleted successfully", "success");
+            loadAdminData();
+          } else {
+            const data = await response.json();
+            showMessage(data.message || "Failed to delete appointment", "error");
+          }
+        } catch (error) {
+          console.error("Error:", error);
+          showMessage("Network error. Please try again.", "error");
+        }
+      }
+
+      function closeEditModal() {
+        editModal.style.display = "none";
+        editForm.reset();
+      }
+
+      // Close modal when clicking outside
+      window.onclick = function(event) {
+        if (event.target === editModal) {
+          closeEditModal();
+        }
+      }
+
+      // Close modal when clicking X
+      document.querySelector('.close').onclick = closeEditModal;
+
+      // Handle form submission
+      editForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const appointmentId = editForm.dataset.appointmentId;
+        const formData = {
+          fullName: document.getElementById('editFullName').value,
+          email: document.getElementById('editEmail').value,
+          phone: document.getElementById('editPhone').value,
+          service: document.getElementById('editService').value,
+          appointmentDate: document.getElementById('editDate').value,
+          timeSlot: document.getElementById('editTimeSlot').value,
+          notes: document.getElementById('editNotes').value
+        };
+
+        try {
+          const response = await fetch(`http://localhost:5000/api/admin/appointments/${appointmentId}`, {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`
+            },
+            body: JSON.stringify(formData)
+          });
+
+          if (response.ok) {
+            showMessage("Appointment updated successfully", "success");
+            closeEditModal();
+            loadAdminData();
+          } else {
+            const data = await response.json();
+            showMessage(data.message || "Failed to update appointment", "error");
+          }
+        } catch (error) {
+          console.error("Error:", error);
+          showMessage("Network error. Please try again.", "error");
+        }
+      });
+
+      function exportAppointments() {
+        const csvContent = "data:text/csv;charset=utf-8," 
+          + "ID,Patient Name,Email,Phone,Service,Date,Time,Status,Notes\n"
+          + currentAppointments.map(a => 
+            `${a.id},"${a.fullName}","${a.email}","${a.phone}","${a.service}","${new Date(a.appointmentDate).toLocaleDateString()}","${a.timeSlot}","${a.status}","${a.notes || ''}"`
+          ).join("\n");
+
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", "appointments.csv");
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }
+
+      function showMessage(message, type) {
+        messageDiv.textContent = message;
+        messageDiv.style.display = "block";
+
+        const colors = {
+          success: { bg: "#e8f5e8", color: "#2e7d32" },
+          error: { bg: "#ffebee", color: "#c62828" },
+          info: { bg: "#e3f2fd", color: "#1976d2" },
+        };
+
+        messageDiv.style.backgroundColor = colors[type].bg;
+        messageDiv.style.color = colors[type].color;
+
+        setTimeout(() => {
+          messageDiv.style.display = "none";
+        }, 5000);
+      }
+    </script>
+  </body>
+</html> 

@@ -5,9 +5,13 @@ A comprehensive backend solution for managing dental service appointments and us
 ## Features
 
 - **User Authentication**: Secure registration and login with JWT tokens
+- **Role-Based Access Control**: Admin and user roles with different permissions
 - **Appointment Management**: Book, view, update, and cancel dental appointments
+- **Admin Dashboard**: Comprehensive admin panel for managing all appointments
 - **Time Slot Management**: Check availability and manage appointment time slots
 - **User Dashboard**: View personal appointment history
+- **Statistics & Analytics**: Admin dashboard with appointment statistics
+- **Export Functionality**: Export appointment data to CSV
 - **Security**: Password hashing, input validation, and CORS protection
 - **SQL Server Integration**: Robust database storage with SQL Server 2014
 
@@ -64,6 +68,14 @@ A comprehensive backend solution for managing dental service appointments and us
    npm start
    ```
 
+6. **Create admin user** (optional):
+   ```bash
+   node create-admin.js
+   ```
+   This creates an admin user with credentials:
+   - Email: admin@shinesmile.com
+   - Password: admin123
+
 ## Quick Start
 
 ### Windows
@@ -99,6 +111,15 @@ npm start
 - `PUT /api/appointments/:id` - Update appointment (protected)
 - `PATCH /api/appointments/:id/cancel` - Cancel appointment (protected)
 - `GET /api/appointments/available-slots/:date` - Get available time slots (protected)
+
+### Admin Routes (Admin Only)
+- `GET /api/admin/appointments` - Get all appointments
+- `GET /api/admin/appointments/:id` - Get specific appointment
+- `PUT /api/admin/appointments/:id` - Update appointment details
+- `PATCH /api/admin/appointments/:id/status` - Update appointment status
+- `DELETE /api/admin/appointments/:id` - Delete appointment
+- `GET /api/admin/statistics` - Get appointment statistics
+- `GET /api/admin/users` - Get all users
 
 ## Database Schema
 
@@ -143,7 +164,8 @@ The backend is designed to work with the existing HTML frontend:
 - **User Registration**: `register.html`
 - **User Login**: `login.html`
 - **Service Booking**: `services.html`
-- **User Dashboard**: `dashboard.html`
+- **User Dashboard**: `dashboard.html` (for regular users)
+- **Admin Dashboard**: `admin.html` (for admin users)
 
 ### Key Features
 - JWT token storage in localStorage
@@ -155,10 +177,26 @@ The backend is designed to work with the existing HTML frontend:
 
 - **Password Hashing**: All passwords are hashed using bcryptjs
 - **JWT Authentication**: Secure token-based authentication
+- **Role-Based Access Control**: Admin and user roles with different permissions
 - **Input Validation**: Comprehensive validation using express-validator
 - **SQL Injection Protection**: Parameterized queries with mssql
 - **CORS Protection**: Cross-origin request handling
 - **Error Handling**: Proper error responses without sensitive data exposure
+
+## Role-Based Access Control
+
+### User Roles
+- **User (default)**: Can book appointments, view their own appointments, and cancel their appointments
+- **Admin**: Can manage all appointments, view statistics, export data, and manage users
+
+### Admin Features
+- View all appointments across all users
+- Update appointment status (pending, confirmed, completed, cancelled)
+- Edit appointment details
+- Delete appointments
+- View appointment statistics
+- Export appointment data to CSV
+- View all registered users
 
 ## Project Structure
 
@@ -171,13 +209,16 @@ shinesmile/
 │   └── Appointment.js       # Appointment model with SQL Server operations
 ├── routes/
 │   ├── auth.js              # Authentication routes
-│   └── appointments.js      # Appointment management routes
+│   ├── appointments.js      # Appointment management routes
+│   └── admin.js             # Admin routes for appointment management
 ├── middleware/
-│   └── auth.js              # JWT authentication middleware
+│   ├── auth.js              # JWT authentication middleware
+│   └── admin.js             # Admin role verification middleware
 ├── server.js                # Main server file
 ├── package.json             # Dependencies and scripts
 ├── config.env               # Environment variables template
 ├── test-backend.js          # Backend testing script
+├── create-admin.js          # Script to create admin user
 ├── install.bat              # Windows installation script
 ├── install.sh               # Unix installation script
 └── README.md               # This file
