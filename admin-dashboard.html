@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Admin Dashboard - ShineSmile</title>
     <link rel="stylesheet" href="/assets/css/style.css" />
+    <link rel="stylesheet" href="/assets/css/chat.css" />
     <style>
       .admin-dashboard {
         background: var(--header-bg);
@@ -141,6 +142,7 @@
         <a href="#" class="navbar__link">Home</a>
         <a href="#" class="navbar__link active">Appointments</a>
         <a href="#" class="navbar__link">Reports</a>
+        <a href="#" class="navbar__link" id="chatTab">Live Chat</a>
       </nav>
       <main>
         <h2>Appointment Management</h2>
@@ -161,6 +163,40 @@
         </table>
         <button id="refresh">Refresh Appointments</button>
       </main>
+      
+      <!-- Chat Interface for Admin -->
+      <div id="adminChat" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 80%; height: 80%; background: white; border-radius: 15px; box-shadow: 0 10px 40px rgba(0,0,0,0.3); z-index: 1000;">
+        <div style="background: linear-gradient(135deg, #2e80ce 0%, #1e88e5 100%); color: white; padding: 15px 20px; border-radius: 15px 15px 0 0; display: flex; justify-content: space-between; align-items: center;">
+          <h3 style="margin: 0;">Live Chat - Admin Panel</h3>
+          <button id="closeAdminChat" style="background: none; border: none; color: white; font-size: 20px; cursor: pointer;">&times;</button>
+        </div>
+        
+        <div style="display: flex; height: calc(100% - 60px);">
+          <!-- Online Users Panel -->
+          <div style="width: 250px; border-right: 1px solid #e0e0e0; background: #f8f9fa;">
+            <div style="padding: 15px; border-bottom: 1px solid #e0e0e0;">
+              <h4 style="margin: 0; color: #333;">Online Users</h4>
+            </div>
+            <div id="onlineUsers" style="padding: 15px; overflow-y: auto; height: calc(100% - 60px);">
+              <p style="color: #666; text-align: center;">Loading users...</p>
+            </div>
+          </div>
+          
+          <!-- Chat Messages -->
+          <div style="flex: 1; display: flex; flex-direction: column;">
+            <div id="adminChatMessages" style="flex: 1; padding: 15px; overflow-y: auto; background: #f8f9fa;">
+              <div style="text-align: center; color: #666; margin-top: 20px;">
+                Welcome to Admin Chat Panel
+              </div>
+            </div>
+            
+            <div style="padding: 15px; border-top: 1px solid #e0e0e0; display: flex; gap: 10px;">
+              <input type="text" id="adminMessageInput" placeholder="Type your message..." style="flex: 1; padding: 12px; border: 1px solid #e0e0e0; border-radius: 25px; outline: none;">
+              <button id="adminSendMessage" style="background: #2e80ce; color: white; border: none; border-radius: 50%; width: 40px; height: 40px; cursor: pointer;">→</button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <script>
@@ -282,6 +318,152 @@
       });
 
       fetchAppointments();
+      
+      // Admin Chat Functionality
+      let adminSocket = null;
+      let onlineUsers = [];
+      
+      // Initialize admin chat
+      function initAdminChat() {
+        // Load Socket.IO client
+        const script = document.createElement('script');
+        script.src = 'https://cdn.socket.io/4.7.4/socket.io.min.js';
+        script.onload = () => {
+          adminSocket = io('http://localhost:5000');
+          
+          adminSocket.on('connect', () => {
+            console.log('Admin connected to chat server');
+            
+            // Join as admin
+            adminSocket.emit('join-chat', {
+              name: 'Admin',
+              email: 'admin@shinesmile.com',
+              isAdmin: true
+            });
+          });
+          
+          adminSocket.on('chat-message', (message) => {
+            addAdminMessage(message);
+          });
+          
+          adminSocket.on('user-joined', (data) => {
+            addAdminSystemMessage(data.message);
+            updateOnlineUsers();
+          });
+          
+          adminSocket.on('user-left', (data) => {
+            addAdminSystemMessage(data.message);
+            updateOnlineUsers();
+          });
+          
+          adminSocket.on('online-users', (users) => {
+            onlineUsers = users;
+            displayOnlineUsers();
+          });
+        };
+        document.head.appendChild(script);
+      }
+      
+      // Add message to admin chat
+      function addAdminMessage(message) {
+        const messagesContainer = document.getElementById('adminChatMessages');
+        const messageDiv = document.createElement('div');
+        
+        const messageClass = message.isSystem ? 'system' : 
+                            message.isAdmin ? 'admin' : 'user';
+        
+        const time = new Date(message.timestamp).toLocaleTimeString('vi-VN', {
+          hour: '2-digit',
+          minute: '2-digit'
+        });
+        
+        messageDiv.className = `chat-message ${messageClass}`;
+        messageDiv.innerHTML = `
+          <div class="message-bubble">
+            <strong>${message.sender}:</strong> ${escapeHtml(message.message)}
+          </div>
+          <div class="message-time">${time}</div>
+        `;
+        
+        messagesContainer.appendChild(messageDiv);
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+      }
+      
+      function addAdminSystemMessage(message) {
+        const systemMessage = {
+          id: Date.now().toString(),
+          sender: 'System',
+          message: message,
+          timestamp: new Date(),
+          isSystem: true
+        };
+        addAdminMessage(systemMessage);
+      }
+      
+      function displayOnlineUsers() {
+        const usersContainer = document.getElementById('onlineUsers');
+        if (onlineUsers.length === 0) {
+          usersContainer.innerHTML = '<p style="color: #666; text-align: center;">No users online</p>';
+          return;
+        }
+        
+        usersContainer.innerHTML = onlineUsers.map(user => `
+          <div style="padding: 8px; margin: 5px 0; background: white; border-radius: 8px; border-left: 3px solid #4caf50;">
+            <div style="font-weight: bold; color: #333;">${user.name}</div>
+            <div style="font-size: 12px; color: #666;">${user.email}</div>
+            <div style="font-size: 11px; color: #999;">Joined: ${new Date(user.timestamp).toLocaleTimeString()}</div>
+          </div>
+        `).join('');
+      }
+      
+      function updateOnlineUsers() {
+        if (adminSocket) {
+          adminSocket.emit('admin-action', { type: 'get-online-users' });
+        }
+      }
+      
+      function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+      }
+      
+      // Chat tab click handler
+      document.getElementById('chatTab').addEventListener('click', (e) => {
+        e.preventDefault();
+        document.getElementById('adminChat').style.display = 'block';
+        updateOnlineUsers();
+      });
+      
+      // Close chat handler
+      document.getElementById('closeAdminChat').addEventListener('click', () => {
+        document.getElementById('adminChat').style.display = 'none';
+      });
+      
+      // Send message handler
+      document.getElementById('adminSendMessage').addEventListener('click', () => {
+        sendAdminMessage();
+      });
+      
+      // Enter key handler
+      document.getElementById('adminMessageInput').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+          sendAdminMessage();
+        }
+      });
+      
+      function sendAdminMessage() {
+        const input = document.getElementById('adminMessageInput');
+        const message = input.value.trim();
+        
+        if (message && adminSocket) {
+          adminSocket.emit('send-message', { message });
+          input.value = '';
+        }
+      }
+      
+      // Initialize admin chat
+      initAdminChat();
     </script>
   </body>
 </html>

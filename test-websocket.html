@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebSocket Chat Test</title>
+    <link rel="stylesheet" href="./assets/css/chat.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .test-info {
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .test-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .test-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .test-btn.primary {
+            background: #2e80ce;
+            color: white;
+        }
+        .test-btn.secondary {
+            background: #f0f0f0;
+            color: #333;
+        }
+        .status {
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .status.connected {
+            background: #e8f5e8;
+            color: #2e7d32;
+        }
+        .status.disconnected {
+            background: #ffebee;
+            color: #c62828;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>WebSocket Chat Test</h1>
+        
+        <div class="test-info">
+            <h3>Test Instructions:</h3>
+            <ol>
+                <li>Start the server: <code>npm start</code></li>
+                <li>Open this page in multiple browser tabs</li>
+                <li>Click "Connect as User" in one tab and "Connect as Admin" in another</li>
+                <li>Test the chat functionality between users and admin</li>
+                <li>Check that the chat widget appears on all user pages</li>
+            </ol>
+        </div>
+
+        <div class="test-buttons">
+            <button class="test-btn primary" onclick="connectAsUser()">Connect as User</button>
+            <button class="test-btn primary" onclick="connectAsAdmin()">Connect as Admin</button>
+            <button class="test-btn secondary" onclick="disconnect()">Disconnect</button>
+            <button class="test-btn secondary" onclick="testMessage()">Send Test Message</button>
+        </div>
+
+        <div id="status" class="status disconnected">Disconnected</div>
+        
+        <div id="messages" style="height: 300px; overflow-y: auto; border: 1px solid #ccc; padding: 10px; background: #f8f9fa;">
+            <p>Messages will appear here...</p>
+        </div>
+    </div>
+
+    <script src="https://cdn.socket.io/4.7.4/socket.io.min.js"></script>
+    <script>
+        let socket = null;
+        let userType = null;
+
+        function connectAsUser() {
+            if (socket) socket.disconnect();
+            
+            socket = io('http://localhost:5000');
+            userType = 'user';
+            
+            socket.on('connect', () => {
+                updateStatus('Connected as User', 'connected');
+                addMessage('System', 'Connected as user');
+                
+                socket.emit('join-chat', {
+                    name: 'Test User',
+                    email: 'test@example.com',
+                    isAdmin: false
+                });
+            });
+            
+            setupSocketListeners();
+        }
+
+        function connectAsAdmin() {
+            if (socket) socket.disconnect();
+            
+            socket = io('http://localhost:5000');
+            userType = 'admin';
+            
+            socket.on('connect', () => {
+                updateStatus('Connected as Admin', 'connected');
+                addMessage('System', 'Connected as admin');
+                
+                socket.emit('join-chat', {
+                    name: 'Admin',
+                    email: 'admin@shinesmile.com',
+                    isAdmin: true
+                });
+            });
+            
+            setupSocketListeners();
+        }
+
+        function setupSocketListeners() {
+            socket.on('disconnect', () => {
+                updateStatus('Disconnected', 'disconnected');
+                addMessage('System', 'Disconnected from server');
+            });
+
+            socket.on('chat-message', (message) => {
+                addMessage(message.sender, message.message);
+            });
+
+            socket.on('user-joined', (data) => {
+                addMessage('System', data.message);
+            });
+
+            socket.on('user-left', (data) => {
+                addMessage('System', data.message);
+            });
+        }
+
+        function disconnect() {
+            if (socket) {
+                socket.disconnect();
+                socket = null;
+                userType = null;
+                updateStatus('Disconnected', 'disconnected');
+                addMessage('System', 'Manually disconnected');
+            }
+        }
+
+        function testMessage() {
+            if (socket && socket.connected) {
+                const message = `Test message from ${userType} at ${new Date().toLocaleTimeString()}`;
+                socket.emit('send-message', { message });
+                addMessage('You', message);
+            } else {
+                addMessage('System', 'Not connected to server');
+            }
+        }
+
+        function updateStatus(text, className) {
+            const status = document.getElementById('status');
+            status.textContent = text;
+            status.className = `status ${className}`;
+        }
+
+        function addMessage(sender, message) {
+            const messages = document.getElementById('messages');
+            const messageDiv = document.createElement('div');
+            messageDiv.style.marginBottom = '10px';
+            messageDiv.innerHTML = `
+                <strong>${sender}:</strong> ${message}
+                <br><small style="color: #666;">${new Date().toLocaleTimeString()}</small>
+            `;
+            messages.appendChild(messageDiv);
+            messages.scrollTop = messages.scrollHeight;
+        }
+
+        // Test chat widget
+        document.addEventListener('DOMContentLoaded', () => {
+            // Load chat widget
+            const script = document.createElement('script');
+            script.src = './assets/js/chat.js';
+            document.head.appendChild(script);
+        });
+    </script>
+</body>
+</html> 
