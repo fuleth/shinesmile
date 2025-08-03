@@ -133,6 +133,13 @@ connectDB()
     process.exit(1);
   });
 
+// Debug middleware for appointments API
+app.use('/api/appointments', (req, res, next) => {
+  console.log(`[${new Date().toISOString()}] ${req.method} ${req.path}`);
+  console.log('Headers:', req.headers);
+  next();
+});
+
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/appointments', appointmentRoutes);
@@ -160,6 +167,10 @@ app.get('/dashboard', (req, res) => {
 
 // Serve admin dashboard
 app.get('/admin/dashboard', (req, res) => {
+  res.sendFile(path.join(__dirname, 'admin-dashboard.html'));
+});
+
+app.get('/admin-dashboard.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'admin-dashboard.html'));
 });
 

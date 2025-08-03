@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ccc; }
+        .success { background-color: #d4edda; color: #155724; }
+        .error { background-color: #f8d7da; color: #721c24; }
+        button { padding: 10px 15px; margin: 5px; }
+        #appointments { margin-top: 20px; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+    </style>
+</head>
+<body>
+    <h1>Admin Dashboard Test</h1>
+    
+    <div class="test-section">
+        <h3>Authentication Test</h3>
+        <button onclick="testAuth()">Test Authentication</button>
+        <div id="authResult"></div>
+    </div>
+    
+    <div class="test-section">
+        <h3>Appointments Test</h3>
+        <button onclick="testAppointments()">Test Appointments API</button>
+        <div id="appointmentsResult"></div>
+    </div>
+    
+    <div class="test-section">
+        <h3>Appointments List</h3>
+        <div id="appointments"></div>
+    </div>
+
+    <script>
+        function testAuth() {
+            const token = localStorage.getItem("token");
+            const user = JSON.parse(localStorage.getItem("user") || "{}");
+            
+            const resultDiv = document.getElementById("authResult");
+            
+            if (!token) {
+                resultDiv.innerHTML = '<div class="error">❌ No token found</div>';
+                return;
+            }
+            
+            if (!user || user.role !== 'admin') {
+                resultDiv.innerHTML = `<div class="error">❌ User is not admin. Role: ${user.role || 'undefined'}</div>`;
+                return;
+            }
+            
+            resultDiv.innerHTML = `<div class="success">✅ Admin authenticated. User: ${user.fullName} (${user.email})</div>`;
+        }
+        
+        async function testAppointments() {
+            const token = localStorage.getItem("token");
+            const resultDiv = document.getElementById("appointmentsResult");
+            
+            if (!token) {
+                resultDiv.innerHTML = '<div class="error">❌ No token found</div>';
+                return;
+            }
+            
+            try {
+                const response = await fetch("http://localhost:5000/api/appointments/all-appointments", {
+                    headers: { Authorization: `Bearer ${token}` },
+                });
+                
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                resultDiv.innerHTML = `<div class="success">✅ Appointments loaded successfully. Count: ${data.appointments.length}</div>`;
+                
+                // Display appointments
+                displayAppointments(data.appointments);
+                
+            } catch (error) {
+                console.error("Error:", error);
+                resultDiv.innerHTML = `<div class="error">❌ Error loading appointments: ${error.message}</div>`;
+            }
+        }
+        
+        function displayAppointments(appointments) {
+            const container = document.getElementById("appointments");
+            
+            if (appointments.length === 0) {
+                container.innerHTML = '<p>No appointments found</p>';
+                return;
+            }
+            
+            let html = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Service</th>
+                            <th>Date</th>
+                            <th>Time</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+            
+            appointments.forEach(appointment => {
+                html += `
+                    <tr>
+                        <td>${appointment.service}</td>
+                        <td>${new Date(appointment.appointmentDate).toLocaleDateString()}</td>
+                        <td>${appointment.timeSlot}</td>
+                        <td>${appointment.fullName}</td>
+                        <td>${appointment.email}</td>
+                        <td>${appointment.phone}</td>
+                        <td>${appointment.status}</td>
+                    </tr>
+                `;
+            });
+            
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        }
+        
+        // Auto-test on page load
+        window.addEventListener('load', () => {
+            testAuth();
+            testAppointments();
+        });
+    </script>
+</body>
+</html> 

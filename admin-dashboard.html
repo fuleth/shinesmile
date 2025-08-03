@@ -201,7 +201,22 @@
 
     <script>
       const token = localStorage.getItem("token");
-      if (!token) window.location.href = "/login.html";
+      const user = JSON.parse(localStorage.getItem("user") || "{}");
+      
+      if (!token) {
+        window.location.href = "/login.html";
+      }
+      
+      // Check if user is admin
+      if (!user || user.role !== 'admin') {
+        console.log('Current user:', user);
+        console.log('User role:', user.role);
+        alert("Access denied. Admin privileges required.");
+        window.location.href = "/login.html";
+      }
+      
+      // Debug: Log user info
+      console.log('Admin user logged in:', user);
 
       const fetchAppointments = async () => {
         try {
@@ -211,9 +226,21 @@
               headers: { Authorization: `Bearer ${token}` },
             }
           );
+          
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+          }
+          
           const { appointments } = await response.json();
           const tbody = document.getElementById("appointments-body");
           tbody.innerHTML = "";
+          
+          if (appointments.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 20px;">No appointments found</td></tr>';
+            return;
+          }
+          
           appointments.forEach((appointment) => {
             const row = document.createElement("tr");
             row.setAttribute("data-appointment-id", appointment.id);
@@ -244,7 +271,7 @@
           });
         } catch (error) {
           console.error("Error fetching appointments:", error);
-          alert("Failed to load appointments. Please try again.");
+          alert(`Failed to load appointments: ${error.message}`);
         }
       };
 
