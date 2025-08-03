@@ -309,6 +309,132 @@
           messageDiv.style.display = "none";
         }, 5000);
       }
+      
+      // Real-time appointment updates
+      function initRealTimeUpdates() {
+        // Load Socket.IO client
+        const script = document.createElement('script');
+        script.src = 'https://cdn.socket.io/4.7.4/socket.io.min.js';
+        script.onload = () => {
+          const socket = io('http://localhost:5000');
+          
+          socket.on('connect', () => {
+            console.log('User connected to real-time updates');
+            
+            // Join as user
+            const user = JSON.parse(localStorage.getItem("user") || "{}");
+            socket.emit('join-chat', {
+              name: user.fullName || 'User',
+              email: user.email || '',
+              isAdmin: false
+            });
+          });
+          
+          socket.on('appointment-update', (eventData) => {
+            console.log('Real-time appointment update:', eventData);
+            
+            const { type, appointment, userId } = eventData;
+            const currentUser = JSON.parse(localStorage.getItem("user") || "{}");
+            
+            // Only show updates for current user's appointments or admin updates
+            if (appointment.userId === currentUser.id || type === 'updated') {
+              let notificationMessage = '';
+              let notificationType = 'info';
+              
+              switch (type) {
+                case 'updated':
+                  notificationMessage = `Your appointment has been updated: ${appointment.service} - ${appointment.status}`;
+                  notificationType = 'info';
+                  break;
+                case 'cancelled':
+                  if (appointment.userId === currentUser.id) {
+                    notificationMessage = `Your appointment has been cancelled: ${appointment.service}`;
+                    notificationType = 'warning';
+                  }
+                  break;
+                case 'deleted':
+                  if (appointment.userId === currentUser.id) {
+                    notificationMessage = `Your appointment has been deleted: ${appointment.service}`;
+                    notificationType = 'error';
+                  }
+                  break;
+              }
+              
+              // Show notification
+              if (notificationMessage) {
+                showRealTimeNotification(notificationMessage, notificationType);
+              }
+              
+              // Refresh appointments list
+              loadAppointments();
+            }
+          });
+        };
+        document.head.appendChild(script);
+      }
+      
+      function showRealTimeNotification(message, type = 'info') {
+        // Create notification element
+        const notification = document.createElement('div');
+        notification.style.cssText = `
+          position: fixed;
+          top: 20px;
+          right: 20px;
+          padding: 15px 20px;
+          border-radius: 8px;
+          color: white;
+          font-weight: bold;
+          z-index: 10000;
+          max-width: 300px;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+          animation: slideInRight 0.3s ease-out;
+        `;
+        
+        // Set background color based on type
+        switch (type) {
+          case 'success':
+            notification.style.backgroundColor = '#4caf50';
+            break;
+          case 'warning':
+            notification.style.backgroundColor = '#ff9800';
+            break;
+          case 'error':
+            notification.style.backgroundColor = '#f44336';
+            break;
+          default:
+            notification.style.backgroundColor = '#2196f3';
+        }
+        
+        notification.textContent = message;
+        document.body.appendChild(notification);
+        
+        // Remove notification after 5 seconds
+        setTimeout(() => {
+          notification.style.animation = 'slideOutRight 0.3s ease-in';
+          setTimeout(() => {
+            if (notification.parentNode) {
+              notification.parentNode.removeChild(notification);
+            }
+          }, 300);
+        }, 5000);
+      }
+      
+      // Add CSS animations
+      const style = document.createElement('style');
+      style.textContent = `
+        @keyframes slideInRight {
+          from { transform: translateX(100%); opacity: 0; }
+          to { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes slideOutRight {
+          from { transform: translateX(0); opacity: 1; }
+          to { transform: translateX(100%); opacity: 0; }
+        }
+      `;
+      document.head.appendChild(style);
+      
+      // Initialize real-time updates
+      initRealTimeUpdates();
     </script>
     
     <!-- Chat Widget -->

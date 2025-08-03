@@ -60,6 +60,11 @@ router.post(
         userId: req.user.id,
       });
 
+      // Emit real-time event for new appointment
+      if (global.emitAppointmentEvent) {
+        global.emitAppointmentEvent('created', appointment, req.user.id);
+      }
+
       res.status(201).json({
         message: "Appointment booked successfully",
         appointment,
@@ -102,6 +107,12 @@ router.put("/appointments/:id", adminAuth, parseId, async (req, res) => {
     }
 
     const updated = await Appointment.updateById(req.params.id, req.body);
+    
+    // Emit real-time event for appointment update
+    if (global.emitAppointmentEvent) {
+      global.emitAppointmentEvent('updated', updated, req.user.id);
+    }
+
     res.json({ message: "Appointment updated successfully", appointment: updated });
   } catch (error) {
     console.error("Update appointment error:", error);
@@ -128,6 +139,12 @@ router.patch("/appointments/:id/cancel", auth, parseId, async (req, res) => {
     }
 
     const updated = await Appointment.updateById(req.params.id, { status: 'cancelled' });
+    
+    // Emit real-time event for appointment cancellation
+    if (global.emitAppointmentEvent) {
+      global.emitAppointmentEvent('cancelled', updated, req.user.id);
+    }
+
     res.json({ message: "Appointment cancelled successfully", appointment: updated });
   } catch (error) {
     console.error("Cancel appointment error:", error);
@@ -138,10 +155,21 @@ router.patch("/appointments/:id/cancel", auth, parseId, async (req, res) => {
 // Admin - Delete appointment by ID
 router.delete("/appointments/:id", adminAuth, parseId, async (req, res) => {
   try {
+    const appointment = await Appointment.findById(req.params.id);
+    if (!appointment) {
+      return res.status(404).json({ message: "Appointment not found" });
+    }
+
     const deleted = await Appointment.deleteById(req.params.id);
     if (!deleted) {
       return res.status(404).json({ message: "Appointment not found" });
     }
+
+    // Emit real-time event for appointment deletion
+    if (global.emitAppointmentEvent) {
+      global.emitAppointmentEvent('deleted', appointment, req.user.id);
+    }
+
     res.json({ message: "Appointment deleted successfully" });
   } catch (error) {
     console.error("Delete appointment error:", error);

@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real-time Appointment Updates Test</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 20px; 
+            background: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .test-section { 
+            margin: 20px 0; 
+            padding: 20px; 
+            border: 1px solid #ddd; 
+            border-radius: 8px;
+            background: #f9f9f9;
+        }
+        .success { background-color: #d4edda; color: #155724; border-color: #c3e6cb; }
+        .error { background-color: #f8d7da; color: #721c24; border-color: #f5c6cb; }
+        .info { background-color: #d1ecf1; color: #0c5460; border-color: #bee5eb; }
+        .warning { background-color: #fff3cd; color: #856404; border-color: #ffeaa7; }
+        
+        button { 
+            padding: 10px 15px; 
+            margin: 5px; 
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .btn-primary { background: #007bff; color: white; }
+        .btn-success { background: #28a745; color: white; }
+        .btn-warning { background: #ffc107; color: black; }
+        .btn-danger { background: #dc3545; color: white; }
+        
+        .log-container {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 10px 0;
+            max-height: 300px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 8px;
+            color: white;
+            font-weight: bold;
+            z-index: 10000;
+            max-width: 300px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            animation: slideInRight 0.3s ease-out;
+        }
+        
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        @keyframes slideOutRight {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(100%); opacity: 0; }
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        .status-connected { background: #28a745; }
+        .status-disconnected { background: #dc3545; }
+        .status-connecting { background: #ffc107; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔴 Real-time Appointment Updates Test</h1>
+        
+        <div class="test-section">
+            <h3>Connection Status</h3>
+            <div>
+                <span class="status-indicator" id="connectionStatus"></span>
+                <span id="connectionText">Connecting...</span>
+            </div>
+            <button onclick="connectSocket()" class="btn-primary">Connect</button>
+            <button onclick="disconnectSocket()" class="btn-danger">Disconnect</button>
+        </div>
+        
+        <div class="test-section">
+            <h3>Authentication Test</h3>
+            <button onclick="testAuth()" class="btn-primary">Test Authentication</button>
+            <div id="authResult"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>Real-time Event Log</h3>
+            <button onclick="clearLog()" class="btn-warning">Clear Log</button>
+            <div class="log-container" id="eventLog">
+                <div>Waiting for real-time events...</div>
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <h3>Test Notifications</h3>
+            <button onclick="testNotification('success')" class="btn-success">Success Notification</button>
+            <button onclick="testNotification('warning')" class="btn-warning">Warning Notification</button>
+            <button onclick="testNotification('error')" class="btn-danger">Error Notification</button>
+            <button onclick="testNotification('info')" class="btn-primary">Info Notification</button>
+        </div>
+        
+        <div class="test-section">
+            <h3>Manual Event Testing</h3>
+            <p>These buttons simulate appointment events for testing:</p>
+            <button onclick="simulateEvent('created')" class="btn-success">Simulate New Appointment</button>
+            <button onclick="simulateEvent('updated')" class="btn-primary">Simulate Updated Appointment</button>
+            <button onclick="simulateEvent('cancelled')" class="btn-warning">Simulate Cancelled Appointment</button>
+            <button onclick="simulateEvent('deleted')" class="btn-danger">Simulate Deleted Appointment</button>
+        </div>
+        
+        <div class="test-section">
+            <h3>Instructions</h3>
+            <ol>
+                <li><strong>Connect</strong> to the WebSocket server</li>
+                <li><strong>Test Authentication</strong> to verify your login status</li>
+                <li>Open another browser tab and <strong>book an appointment</strong> or <strong>login as admin</strong></li>
+                <li>Watch the <strong>Real-time Event Log</strong> for live updates</li>
+                <li>Use <strong>Test Notifications</strong> to see notification styles</li>
+                <li>Use <strong>Manual Event Testing</strong> to simulate events</li>
+            </ol>
+        </div>
+    </div>
+
+    <script>
+        let socket = null;
+        let isConnected = false;
+        
+        function updateConnectionStatus(status, text) {
+            const indicator = document.getElementById('connectionStatus');
+            const textElement = document.getElementById('connectionText');
+            
+            indicator.className = `status-indicator status-${status}`;
+            textElement.textContent = text;
+        }
+        
+        function logEvent(message, type = 'info') {
+            const logContainer = document.getElementById('eventLog');
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = document.createElement('div');
+            logEntry.style.marginBottom = '5px';
+            logEntry.style.padding = '5px';
+            logEntry.style.borderRadius = '3px';
+            
+            switch(type) {
+                case 'success':
+                    logEntry.style.backgroundColor = '#d4edda';
+                    logEntry.style.color = '#155724';
+                    break;
+                case 'error':
+                    logEntry.style.backgroundColor = '#f8d7da';
+                    logEntry.style.color = '#721c24';
+                    break;
+                case 'warning':
+                    logEntry.style.backgroundColor = '#fff3cd';
+                    logEntry.style.color = '#856404';
+                    break;
+                default:
+                    logEntry.style.backgroundColor = '#d1ecf1';
+                    logEntry.style.color = '#0c5460';
+            }
+            
+            logEntry.textContent = `[${timestamp}] ${message}`;
+            logContainer.appendChild(logEntry);
+            logContainer.scrollTop = logContainer.scrollHeight;
+        }
+        
+        function clearLog() {
+            document.getElementById('eventLog').innerHTML = '<div>Log cleared...</div>';
+        }
+        
+        function connectSocket() {
+            if (socket && isConnected) {
+                logEvent('Already connected', 'warning');
+                return;
+            }
+            
+            updateConnectionStatus('connecting', 'Connecting...');
+            logEvent('Attempting to connect to WebSocket server...', 'info');
+            
+            // Load Socket.IO client
+            const script = document.createElement('script');
+            script.src = 'https://cdn.socket.io/4.7.4/socket.io.min.js';
+            script.onload = () => {
+                socket = io('http://localhost:5000');
+                
+                socket.on('connect', () => {
+                    isConnected = true;
+                    updateConnectionStatus('connected', 'Connected');
+                    logEvent('✅ Connected to WebSocket server', 'success');
+                    
+                    // Join as test user
+                    const user = JSON.parse(localStorage.getItem("user") || "{}");
+                    socket.emit('join-chat', {
+                        name: user.fullName || 'Test User',
+                        email: user.email || 'test@example.com',
+                        isAdmin: false
+                    });
+                });
+                
+                socket.on('disconnect', () => {
+                    isConnected = false;
+                    updateConnectionStatus('disconnected', 'Disconnected');
+                    logEvent('❌ Disconnected from WebSocket server', 'error');
+                });
+                
+                socket.on('appointment-update', (eventData) => {
+                    const { type, appointment, userId } = eventData;
+                    logEvent(`📅 Appointment ${type}: ${appointment.service} by ${appointment.fullName}`, 'success');
+                    
+                    // Show notification
+                    showNotification(`Appointment ${type}: ${appointment.service}`, 'info');
+                });
+                
+                socket.on('chat-message', (message) => {
+                    logEvent(`💬 Chat: ${message.sender}: ${message.message}`, 'info');
+                });
+                
+                socket.on('user-joined', (data) => {
+                    logEvent(`👤 User joined: ${data.user.name}`, 'info');
+                });
+                
+                socket.on('user-left', (data) => {
+                    logEvent(`👤 User left: ${data.user.name}`, 'warning');
+                });
+            };
+            document.head.appendChild(script);
+        }
+        
+        function disconnectSocket() {
+            if (socket) {
+                socket.disconnect();
+                socket = null;
+                isConnected = false;
+                updateConnectionStatus('disconnected', 'Disconnected');
+                logEvent('Manually disconnected', 'warning');
+            }
+        }
+        
+        function testAuth() {
+            const token = localStorage.getItem("token");
+            const user = JSON.parse(localStorage.getItem("user") || "{}");
+            const resultDiv = document.getElementById("authResult");
+            
+            if (!token) {
+                resultDiv.innerHTML = '<div class="error">❌ No token found - Please login first</div>';
+                return;
+            }
+            
+            if (!user || !user.id) {
+                resultDiv.innerHTML = '<div class="error">❌ No user data found</div>';
+                return;
+            }
+            
+            resultDiv.innerHTML = `<div class="success">✅ Authenticated as: ${user.fullName || user.username} (${user.email})</div>`;
+            logEvent(`Authentication test passed: ${user.fullName || user.username}`, 'success');
+        }
+        
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = 'notification';
+            
+            // Set background color based on type
+            switch (type) {
+                case 'success':
+                    notification.style.backgroundColor = '#28a745';
+                    break;
+                case 'warning':
+                    notification.style.backgroundColor = '#ffc107';
+                    notification.style.color = '#000';
+                    break;
+                case 'error':
+                    notification.style.backgroundColor = '#dc3545';
+                    break;
+                default:
+                    notification.style.backgroundColor = '#17a2b8';
+            }
+            
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            // Remove notification after 5 seconds
+            setTimeout(() => {
+                notification.style.animation = 'slideOutRight 0.3s ease-in';
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.parentNode.removeChild(notification);
+                    }
+                }, 300);
+            }, 5000);
+        }
+        
+        function testNotification(type) {
+            const messages = {
+                success: 'This is a success notification!',
+                warning: 'This is a warning notification!',
+                error: 'This is an error notification!',
+                info: 'This is an info notification!'
+            };
+            
+            showNotification(messages[type], type);
+            logEvent(`Test notification: ${type}`, 'info');
+        }
+        
+        function simulateEvent(type) {
+            const mockAppointment = {
+                id: Math.floor(Math.random() * 1000),
+                service: 'cleaning',
+                fullName: 'Test User',
+                status: 'pending',
+                appointmentDate: new Date().toISOString(),
+                timeSlot: '10:00 AM'
+            };
+            
+            const eventData = {
+                type: type,
+                appointment: mockAppointment,
+                timestamp: new Date(),
+                userId: 1
+            };
+            
+            logEvent(`Simulated ${type} event for appointment #${mockAppointment.id}`, 'info');
+            showNotification(`Simulated: Appointment ${type}`, 'info');
+        }
+        
+        // Auto-connect on page load
+        window.addEventListener('load', () => {
+            logEvent('Page loaded - Ready to test real-time updates', 'info');
+            setTimeout(connectSocket, 1000);
+        });
+    </script>
+</body>
+</html> 

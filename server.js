@@ -28,6 +28,7 @@ app.use(express.static(path.join(__dirname)));
 // WebSocket connection handling
 const connectedUsers = new Map();
 const chatMessages = [];
+const adminSockets = new Set(); // Track admin sockets separately
 
 io.on('connection', (socket) => {
   console.log('User connected:', socket.id);
@@ -41,6 +42,11 @@ io.on('connection', (socket) => {
       isAdmin: userData.isAdmin || false,
       timestamp: new Date()
     });
+    
+    // Track admin sockets separately for appointment notifications
+    if (userData.isAdmin) {
+      adminSockets.add(socket.id);
+    }
     
     // Send welcome message
     socket.emit('chat-message', {
@@ -110,6 +116,11 @@ io.on('connection', (socket) => {
         message: `${user.name} left the chat`
       });
       connectedUsers.delete(socket.id);
+      
+      // Remove from admin sockets if admin
+      if (user.isAdmin) {
+        adminSockets.delete(socket.id);
+      }
     }
     console.log('User disconnected:', socket.id);
   });
@@ -122,6 +133,30 @@ io.on('connection', (socket) => {
     }
   });
 });
+
+// Real-time appointment event handlers
+const emitAppointmentEvent = (eventType, appointment, userId = null) => {
+  const eventData = {
+    type: eventType,
+    appointment: appointment,
+    timestamp: new Date(),
+    userId: userId
+  };
+
+  // Emit to all connected clients
+  io.emit('appointment-update', eventData);
+  
+  // Log the event
+  console.log(`Appointment ${eventType}:`, {
+    appointmentId: appointment.id,
+    service: appointment.service,
+    user: appointment.fullName,
+    timestamp: new Date().toISOString()
+  });
+};
+
+// Export the emit function for use in routes
+global.emitAppointmentEvent = emitAppointmentEvent;
 
 // Connect to SQL Server database
 connectDB()
